@@ -1,1 +1,137 @@
 
+<div class="status" id="status">
+JARVIS ist bereit.
+</div>
+
+<button onclick="startListening()">🎤 Sprechen</button>
+<button onclick="speak('Guten Abend. JARVIS ist einsatzbereit.')">
+🔊 Begrüßung
+</button>
+
+<input
+id="command"
+type="text"
+placeholder="Schreibe einen Befehl..."
+onkeydown="if(event.key==='Enter') processCommand()"
+>
+
+<button onclick="processCommand()">Befehl senden</button>
+
+<div id="output">
+Guten Tag. Wie kann ich helfen?
+</div>
+
+</div>
+
+<script>
+
+const output = document.getElementById("output");
+const statusText = document.getElementById("status");
+
+function speak(text) {
+    if (!("speechSynthesis" in window)) {
+        output.innerText = text;
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "de-DE";
+    speech.rate = 1;
+
+    speechSynthesis.speak(speech);
+}
+
+function startListening() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        output.innerText =
+            "Spracherkennung wird in diesem Browser nicht unterstützt.";
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "de-DE";
+    recognition.interimResults = false;
+
+    statusText.innerText = "JARVIS hört zu...";
+
+    recognition.onresult = function(event) {
+        document.getElementById("command").value =
+            event.results[0][0].transcript;
+
+        processCommand();
+    };
+
+    recognition.onerror = function() {
+        statusText.innerText = "Spracherkennung nicht verfügbar.";
+    };
+
+    recognition.onend = function() {
+        statusText.innerText = "JARVIS ist bereit.";
+    };
+
+    recognition.start();
+}
+
+function processCommand() {
+
+    const command = document
+        .getElementById("command")
+        .value.toLowerCase()
+        .trim();
+
+    let answer = "";
+
+    if (command.includes("hallo") ||
+        command.includes("guten tag")) {
+
+        answer = "Guten Tag. JARVIS ist einsatzbereit.";
+
+    } else if (command.includes("wie heißt du")) {
+
+        answer = "Mein Name ist JARVIS. Persönlicher Assistent Version 1.0.";
+
+    } else if (command.includes("uhrzeit")) {
+
+        answer = "Es ist " +
+            new Date().toLocaleTimeString("de-DE");
+
+    } else if (command.includes("datum")) {
+
+        answer = "Heute ist der " +
+            new Date().toLocaleDateString("de-DE");
+
+    } else if (command.includes("hand in hand")) {
+
+        answer = "Hand in Hand Haus und Alltagshilfe ist unser Hauptprojekt. Ich unterstütze dich bei Planung und Organisation.";
+
+    } else if (command.includes("hilfe")) {
+
+        answer = "Du kannst mich nach meinem Namen, dem Datum, der Uhrzeit oder unserem Unternehmen fragen.";
+
+    } else if (command.includes("danke")) {
+
+        answer = "Gern geschehen. JARVIS steht bereit.";
+
+    } else {
+
+        answer = "Diesen Befehl kenne ich noch nicht. Meine Grundversion wird weiterentwickelt.";
+    }
+
+    output.innerText = answer;
+    speak(answer);
+
+    document.getElementById("command").value = "";
+}
+
+</script>
+
+</body>
+</html>
+
