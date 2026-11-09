@@ -1,24 +1,165 @@
+HTML
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050d18">
+<title>JARVIS AI 1.0</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle, #102c42, #030811 75%);
+    color: #00d9ff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.app {
+    width: 100%;
+    max-width: 650px;
+    padding: 25px;
+    border: 1px solid #00d9ff;
+    border-radius: 22px;
+    background: rgba(4, 18, 32, 0.95);
+    box-shadow: 0 0 35px #007b9c;
+    text-align: center;
+}
+
+h1 {
+    font-size: 38px;
+    letter-spacing: 7px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #7b9eaf;
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+.reactor {
+    width: 190px;
+    height: 190px;
+    margin: 35px auto;
+    border: 3px solid #00d9ff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 65px;
+    text-shadow: 0 0 20px #00d9ff;
+    box-shadow: 0 0 20px #00d9ff,
+                inset 0 0 25px #007b9c;
+    animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+    50% {
+        box-shadow: 0 0 40px #00d9ff,
+                    inset 0 0 40px #007b9c;
+    }
+}
+
+.info {
+    color: #8caebd;
+    margin: 12px;
+}
+
+.status {
+    color: #00ffae;
+    margin: 20px;
+    font-weight: bold;
+}
+
+button {
+    background: #00bde8;
+    color: #00111d;
+    border: none;
+    border-radius: 9px;
+    padding: 13px 18px;
+    margin: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #80edff;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    background: #10283b;
+    color: white;
+    border: 1px solid #00d9ff;
+    border-radius: 9px;
+    font-size: 16px;
+}
+
+.output {
+    margin-top: 20px;
+    padding: 18px;
+    min-height: 75px;
+    background: #10283b;
+    border-radius: 10px;
+    color: white;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.footer {
+    color: #57798c;
+    font-size: 11px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>J.A.R.V.I.S.</h1>
+<div class="subtitle">PERSONAL ARTIFICIAL INTELLIGENCE</div>
+
+<div class="reactor">J</div>
+
+<div class="info" id="clock"></div>
 <div class="status" id="status">
-JARVIS ist bereit.
+SYSTEM ONLINE – JARVIS BEREIT
 </div>
 
-<button onclick="startListening()">🎤 Sprechen</button>
-<button onclick="speak('Guten Abend. JARVIS ist einsatzbereit.')">
-🔊 Begrüßung
-</button>
+<button onclick="startListening()">🎤 SPRACHSTEUERUNG</button>
+
+<button onclick="greet()">🔊 BEGRÜSSUNG</button>
 
 <input
 id="command"
 type="text"
-placeholder="Schreibe einen Befehl..."
-onkeydown="if(event.key==='Enter') processCommand()"
->
+placeholder="Befehl an JARVIS..."
+onkeydown="if(event.key==='Enter') processCommand()">
 
-<button onclick="processCommand()">Befehl senden</button>
+<button onclick="processCommand()">AUSFÜHREN</button>
 
-<div id="output">
-Guten Tag. Wie kann ich helfen?
+<div class="output" id="output">
+Guten Abend. Ich bin JARVIS.
+Alle Systeme sind bereit.
+</div>
+
+<div class="footer">
+JARVIS AI SYSTEM · VERSION 1.0 · 2026
 </div>
 
 </div>
@@ -26,7 +167,18 @@ Guten Tag. Wie kann ich helfen?
 <script>
 
 const output = document.getElementById("output");
-const statusText = document.getElementById("status");
+const status = document.getElementById("status");
+
+function updateClock() {
+    const now = new Date();
+
+    document.getElementById("clock").innerText =
+        now.toLocaleDateString("de-DE") + " | " +
+        now.toLocaleTimeString("de-DE");
+}
+
+updateClock();
+setInterval(updateClock, 1000);
 
 function speak(text) {
     if (!("speechSynthesis" in window)) {
@@ -36,30 +188,41 @@ function speak(text) {
 
     speechSynthesis.cancel();
 
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "de-DE";
-    speech.rate = 1;
+    const message = new SpeechSynthesisUtterance(text);
+    message.lang = "de-DE";
+    message.rate = 0.95;
+    message.pitch = 0.9;
 
-    speechSynthesis.speak(speech);
+    speechSynthesis.speak(message);
+}
+
+function greet() {
+    const text =
+        "Guten Abend. JARVIS ist online. " +
+        "Wie kann ich dich unterstützen?";
+
+    output.innerText = text;
+    speak(text);
 }
 
 function startListening() {
 
-    const SpeechRecognition =
+    const Recognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
+    if (!Recognition) {
         output.innerText =
-            "Spracherkennung wird in diesem Browser nicht unterstützt.";
+            "Dein Browser unterstützt diese Spracherkennung nicht.";
         return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition = new Recognition();
+
     recognition.lang = "de-DE";
     recognition.interimResults = false;
 
-    statusText.innerText = "JARVIS hört zu...";
+    status.innerText = "JARVIS HÖRT ZU...";
 
     recognition.onresult = function(event) {
         document.getElementById("command").value =
@@ -69,11 +232,11 @@ function startListening() {
     };
 
     recognition.onerror = function() {
-        statusText.innerText = "Spracherkennung nicht verfügbar.";
+        status.innerText = "SPRACHEINGABE NICHT VERFÜGBAR";
     };
 
     recognition.onend = function() {
-        statusText.innerText = "JARVIS ist bereit.";
+        status.innerText = "SYSTEM ONLINE – JARVIS BEREIT";
     };
 
     recognition.start();
@@ -86,20 +249,23 @@ function processCommand() {
         .value.toLowerCase()
         .trim();
 
-    let answer = "";
+    if (!command) return;
+
+    let answer;
 
     if (command.includes("hallo") ||
-        command.includes("guten tag")) {
+        command.includes("guten morgen")) {
 
         answer = "Guten Tag. JARVIS ist einsatzbereit.";
 
-    } else if (command.includes("wie heißt du")) {
+    } else if (command.includes("wer bist du") ||
+               command.includes("wie heißt du")) {
 
-        answer = "Mein Name ist JARVIS. Persönlicher Assistent Version 1.0.";
+        answer = "Ich bin JARVIS, dein persönlicher digitaler Assistent.";
 
     } else if (command.includes("uhrzeit")) {
 
-        answer = "Es ist " +
+        answer = "Die aktuelle Uhrzeit ist " +
             new Date().toLocaleTimeString("de-DE");
 
     } else if (command.includes("datum")) {
@@ -109,11 +275,15 @@ function processCommand() {
 
     } else if (command.includes("hand in hand")) {
 
-        answer = "Hand in Hand Haus und Alltagshilfe ist unser Hauptprojekt. Ich unterstütze dich bei Planung und Organisation.";
+        answer = "Hand in Hand Haus und Alltagshilfe ist unser Hauptprojekt. Ich unterstütze dich bei Strategie, Finanzen, Organisation und Unternehmensaufbau.";
+
+    } else if (command.includes("systemstatus")) {
+
+        answer = "Alle Grundfunktionen von JARVIS sind betriebsbereit.";
 
     } else if (command.includes("hilfe")) {
 
-        answer = "Du kannst mich nach meinem Namen, dem Datum, der Uhrzeit oder unserem Unternehmen fragen.";
+        answer = "Ich kann Datum, Uhrzeit, Begrüßung und Informationen zu Hand in Hand bereitstellen.";
 
     } else if (command.includes("danke")) {
 
@@ -121,7 +291,7 @@ function processCommand() {
 
     } else {
 
-        answer = "Diesen Befehl kenne ich noch nicht. Meine Grundversion wird weiterentwickelt.";
+        answer = "Befehl erkannt, aber noch nicht in meiner Grundversion hinterlegt. Eine KI-Anbindung wird in der nächsten Entwicklungsstufe ergänzt.";
     }
 
     output.innerText = answer;
@@ -134,4 +304,6 @@ function processCommand() {
 
 </body>
 </html>
+
+
 
